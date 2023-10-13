@@ -1,0 +1,12 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="col-lg-4 offset-lg-4 content-block">
+  <h2 class="title" style="text-align: center;">Logout</h2>
+  <p style="text-align: center;">Are you want to log out?</p>
+  <form method="post" style="text-align: center;">
+    {% csrf_token %}
+    <input class="button" type="submit" value="Logout">
+  </form>
+</div>
+{% endblock %}

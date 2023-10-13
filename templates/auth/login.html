@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="col-lg-4 offset-lg-4 content-block">
+  <h2 class="title" style="text-align: center;">Login</h2>
+  {% if error_message %}
+    <p class="alert alert-danger">{{ error_message }}</p>
+  {% endif %}
+  <form method="POST" style="text-align: center;">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Login">
+  </form>
+</div>
+{% endblock %}

@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{{ '/' }}">LearnMLHub</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -9,6 +10,18 @@
                 <li class="nav-item p-2">
                     <a class="nav-link text-light" href="{{ '/' }}">Home</a>
                 </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item p-2 offset-lg-10">
+                        <a class="nav-link text-light" href="{{ '/users/logout/' }}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item p-2 offset-lg-9">
+                        <a class="nav-link text-light" href="{{ '/users/login/' }}">Login</a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link text-light" href="{{ '/users/registration/' }}">SignUp</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
