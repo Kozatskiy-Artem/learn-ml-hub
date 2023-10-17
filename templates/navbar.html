@@ -10,12 +10,23 @@
                 <li class="nav-item p-2">
                     <a class="nav-link text-light" href="{{ '/' }}">Home</a>
                 </li>
+                <li class="nav-item dropdown p-2">
+                    <a class="nav-link dropdown-toggle text-light" href="{{ '/book' }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Info
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ '/ml' }}">Вступ до машинного навчання</a></li>
+                        <li><a class="dropdown-item" href="{{ '/ml/types' }}">Типи машинного навчання</a></li>
+                        <li><a class="dropdown-item" href="{{ '/neural_networks' }}">Основи нейронних мереж</a></li>
+                        <li><a class="dropdown-item" href="{{ '/deep_learning' }}">Глибоке навчання</a></li>
+                    </ul>
+                </li>
                 {% if user.is_authenticated %}
-                    <li class="nav-item p-2 offset-lg-10">
+                    <li class="nav-item p-2 offset-lg-9">
                         <a class="nav-link text-light" href="{{ '/users/logout/' }}">Logout</a>
                     </li>
                 {% else %}
-                    <li class="nav-item p-2 offset-lg-9">
+                    <li class="nav-item p-2 offset-lg-8">
                         <a class="nav-link text-light" href="{{ '/users/login/' }}">Login</a>
                     </li>
                     <li class="nav-item p-2">

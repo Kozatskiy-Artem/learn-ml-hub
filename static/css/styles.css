@@ -1,0 +1,17 @@
+html,
+body {
+    text-decoration: none;
+    background-image: url('https://builtin.com/sites/www.builtin.com/files/styles/og/public/2021-12/machine-learning-examples-applications.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.block {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border: 1px solid #000;
+    border-radius: 30px;
+}
+.block-margin {
+    margin: 30px 0;
+}

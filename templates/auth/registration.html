@@ -2,23 +2,24 @@
 
 {% block content %}
 <div class="col-lg-4 offset-lg-4 content-block">
-  <h2 class="title" style="text-align: center;">Registration</h2>
-
-  <form method="POST" style="text-align: center;">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="form-group">
-            <p>
-                {{ field.label_tag }}
-                {{ field }}
-                {{ field.help_text }}
-                {% if field.errors %}
-                    <div class="alert alert-danger">{{ field.errors|striptags }}</div>
-                {% endif %}
-            </p>
-        </div>
-      {% endfor %}
-      <input class="btn btn-primary" type="submit" value="Register">
-  </form>
+    <div class="block block-margin">
+        <h2 class="title" style="text-align: center;">Registration</h2>
+        <form method="POST" style="text-align: center;">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <p>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.help_text }}
+                        {% if field.errors %}
+                            <div class="alert alert-danger">{{ field.errors|striptags }}</div>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+            <input class="btn btn-primary" type="submit" value="Register">
+        </form>
+    </div>
 </div>
 {% endblock %}
