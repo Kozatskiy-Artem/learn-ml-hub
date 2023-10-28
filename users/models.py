@@ -7,8 +7,9 @@ from .managers import UserManager
 class UserModel(AbstractUser):
     """Model for user object, inherited from AbstractUser"""
 
+    username = None
     email = models.EmailField(unique=True)
-    avatar = models.ImageField(upload_to="media/avatars/", null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
     objects = UserManager()
 
