@@ -1,6 +1,6 @@
 import keras
-from PIL import Image
 import numpy as np
+from PIL import Image
 
 from .interfaces import ImageRepositoryInterface
 
@@ -85,7 +85,7 @@ class ClassificationService:
 
         """
 
-        image_path = 'images/' + image_name
+        image_path = "images/" + image_name
         image.save("media/" + image_path)
 
         image = self.image_repository.save_image(user=user, title=title, image_path=image_path)
@@ -120,23 +120,27 @@ class ClassificationService:
 
         """
 
-        model = keras.models.Sequential([
-            keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)),
-            keras.layers.MaxPooling2D(2, 2),
-            keras.layers.Conv2D(64, (3, 3), activation='relu'),
-            keras.layers.MaxPooling2D(2, 2),
-            keras.layers.Conv2D(128, (3, 3), activation='relu'),
-            keras.layers.MaxPooling2D(2, 2),
-            keras.layers.Conv2D(128, (3, 3), activation='relu'),
-            keras.layers.MaxPooling2D(2, 2),
-            keras.layers.Flatten(),
-            keras.layers.Dense(512, activation='relu'),
-            keras.layers.Dense(1, activation='sigmoid')
-        ])
+        model = keras.models.Sequential(
+            [
+                keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(150, 150, 3)),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Conv2D(64, (3, 3), activation="relu"),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Conv2D(128, (3, 3), activation="relu"),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Conv2D(128, (3, 3), activation="relu"),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Flatten(),
+                keras.layers.Dense(512, activation="relu"),
+                keras.layers.Dense(1, activation="sigmoid"),
+            ]
+        )
 
-        model.compile(loss='binary_crossentropy',
-                      optimizer=keras.optimizers.RMSprop(learning_rate=1e-4),
-                      metrics=['accuracy'])
+        model.compile(
+            loss="binary_crossentropy",
+            optimizer=keras.optimizers.RMSprop(learning_rate=1e-4),
+            metrics=["accuracy"],
+        )
         model.load_weights("./classification/weights.h5")
 
         return model

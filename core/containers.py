@@ -20,6 +20,5 @@ class ServiceContainer(containers.DeclarativeContainer):
     """
 
     classification_service = providers.Factory(
-        ClassificationService,
-        image_repository=RepositoryContainer.image_repository
+        ClassificationService, image_repository=RepositoryContainer.image_repository
     )

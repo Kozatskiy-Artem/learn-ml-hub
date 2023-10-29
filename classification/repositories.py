@@ -1,5 +1,5 @@
-from .models import ImageModel
 from .interfaces import ImageRepositoryInterface
+from .models import ImageModel
 
 
 class ImageRepository(ImageRepositoryInterface):

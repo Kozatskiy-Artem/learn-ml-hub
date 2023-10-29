@@ -1,7 +1,8 @@
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 from core.containers import ServiceContainer
+
 from .forms import ImageUploadForm
 
 
@@ -20,7 +21,7 @@ def cats_or_dogs(request):
         HttpResponse - The rendered HTML page.
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ImageUploadForm(request.POST, request.FILES)
         if form.is_valid():
             classification_service = ServiceContainer.classification_service()
@@ -30,9 +31,9 @@ def cats_or_dogs(request):
 
             return render(
                 request,
-                'classification/cats_or_dogs.html',
-                {'image': image, 'prediction': prediction, 'form': form}
+                "classification/cats_or_dogs.html",
+                {"image": image, "prediction": prediction, "form": form},
             )
 
     form = ImageUploadForm()
-    return render(request, 'classification/cats_or_dogs.html', {'form': form})
+    return render(request, "classification/cats_or_dogs.html", {"form": form})
