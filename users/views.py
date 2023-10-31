@@ -2,6 +2,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from core.containers import ServiceContainer
+from core.exceptions import InstanceNotExistError
+
 from .forms import LoginForm, RegisterForm
 
 
@@ -51,3 +54,15 @@ def log_out(request):
         logout(request)
         return redirect("/users/login/")
     return render(request, "auth/logout.html")
+
+
+@login_required
+def get_profile(request):
+    user_service = ServiceContainer.user_service()
+
+    try:
+        user_dto = user_service.get_profile(request.user.id)
+    except InstanceNotExistError:
+        return render(request, "not_found.html", {"message": "Профіль користувача не знайдено!"})
+
+    return render(request, "auth/profile.html", {"user_dto": user_dto})

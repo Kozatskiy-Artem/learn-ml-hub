@@ -2,6 +2,8 @@ from dependency_injector import containers, providers
 
 from classification.repositories import ImageRepository
 from classification.services import ClassificationService
+from users.repositories import UserRepository
+from users.services import UserService
 
 
 class RepositoryContainer(containers.DeclarativeContainer):
@@ -11,6 +13,7 @@ class RepositoryContainer(containers.DeclarativeContainer):
     """
 
     image_repository = providers.Factory(ImageRepository)
+    user_repository = providers.Factory(UserRepository)
 
 
 class ServiceContainer(containers.DeclarativeContainer):
@@ -22,3 +25,4 @@ class ServiceContainer(containers.DeclarativeContainer):
     classification_service = providers.Factory(
         ClassificationService, image_repository=RepositoryContainer.image_repository
     )
+    user_service = providers.Factory(UserService, user_repository=RepositoryContainer.user_repository)

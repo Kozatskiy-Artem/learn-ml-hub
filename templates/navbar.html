@@ -7,9 +7,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="nav nav-underline col-lg-12">
-                <li class="nav-item p-2">
-                    <a class="nav-link text-light" href="{{ '/' }}">Home</a>
-                </li>
                 <li class="nav-item dropdown p-2">
                     <a class="nav-link dropdown-toggle text-light" href="{{ '/book' }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Info
@@ -26,6 +23,11 @@
                         <a class="nav-link text-light" href="{{ '/classifications' }}">Класифікація</a>
                     </li>
                     <li class="nav-item p-2 offset-lg-8">
+                        <a class="nav-link text-light" href="{{ '/users/profile' }}">
+                            <img width="30px" height="30px" style="border-radius: 10px;" src="{{ user.avatar.url }}" alt="User avatar">
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
                         <a class="nav-link text-light" href="{{ '/users/logout/' }}">Logout</a>
                     </li>
                 {% else %}

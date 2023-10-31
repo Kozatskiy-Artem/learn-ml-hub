@@ -12,6 +12,8 @@ python-dotenv = "^1.0.0"
 pillow = "^10.1.0"
 keras = "2.14.0"
 dependency-injector = "^4.41.0"
+django-annoying = "^0.10.6"
+pydantic = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.6"
