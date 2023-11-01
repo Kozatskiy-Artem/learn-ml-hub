@@ -66,3 +66,30 @@ class LoginForm(forms.Form):
             }
         ),
     )
+
+
+class UserUpdateForm(forms.Form):
+    email = forms.EmailField(
+        max_length=50,
+        label="Електронна адреса:",
+        required=False,
+        disabled=True,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    avatar = forms.ImageField(
+        label="Завантажте фото:",
+        required=False,
+        widget=forms.FileInput(attrs={"class": "form-control"}),
+    )
+    first_name = forms.CharField(
+        max_length=50,
+        label="Введіть ім'я:",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Ім'я"}),
+    )
+    last_name = forms.CharField(
+        max_length=50,
+        label="Введіть прізвище:",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Прізвище"}),
+    )

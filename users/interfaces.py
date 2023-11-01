@@ -16,3 +16,7 @@ class UserRepositoryInterface(metaclass=ABCMeta):
     @abstractmethod
     def get_profile(self, user_id):
         pass
+
+    @abstractmethod
+    def update_profile(self, update_user_dto):
+        pass

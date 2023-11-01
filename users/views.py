@@ -5,7 +5,8 @@ from django.shortcuts import redirect, render
 from core.containers import ServiceContainer
 from core.exceptions import InstanceNotExistError
 
-from .forms import LoginForm, RegisterForm
+from .dto import UpdateUserDTO
+from .forms import LoginForm, RegisterForm, UserUpdateForm
 
 
 def registration(request):
@@ -66,3 +67,34 @@ def get_profile(request):
         return render(request, "not_found.html", {"message": "Профіль користувача не знайдено!"})
 
     return render(request, "auth/profile.html", {"user_dto": user_dto})
+
+
+@login_required
+def update_profile(request):
+    user_service = ServiceContainer.user_service()
+
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, request.FILES)
+        if form.is_valid():
+            update_user_dto = UpdateUserDTO(id=request.user.id, **form.cleaned_data)
+            try:
+                user_dto = user_service.update_profile(update_user_dto)
+            except InstanceNotExistError:
+                return render(request, "not_found.html", {"message": "Профіль користувача не знайдено!"})
+
+            return render(request, "auth/profile.html", {"user_dto": user_dto})
+
+        context = {"form": form}
+        return render(request, "auth/update_profile.html", context)
+
+    user_dto = user_service.get_profile(request.user.id)
+
+    form = UserUpdateForm(
+        initial={
+            "email": user_dto.email,
+            "first_name": user_dto.first_name,
+            "last_name": user_dto.last_name,
+        }
+    )
+
+    return render(request, "auth/update_profile.html", {"form": form, "user_dto": user_dto})
