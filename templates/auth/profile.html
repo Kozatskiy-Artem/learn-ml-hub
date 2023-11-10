@@ -1,11 +1,13 @@
 {% extends '_base.html' %}
 
-{% block title %}My profile{% endblock %}
+{% block title %}Мій профіль{% endblock %}
 
 {% block content %}
   <div class="col-lg-8 offset-lg-2 content-block">
     <div class="block block-margin row">
-      <h2 style="text-align: center;">Мій профіль</h2>
+      <h2 class="col-10" style="text-align: center;">Мій профіль</h2>
+      <a class="offset-6 btn btn-info bi bi-pencil-square profile-buttons" href="{{ '/users/profile/update' }}"></a>
+      <a class="btn btn-danger bi bi-trash3 profile-buttons" href="{{ '/users/profile/delete' }}"></a>
       <hr>
       <div class="col-lg-4">
           <img width="200px" height="200px" src="{{ user_dto.avatar }}" alt="User avatar">

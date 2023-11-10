@@ -15,3 +15,10 @@ class UserModel(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    def delete(self, *args, **kwargs):
+        if self.avatar:
+            storage, path = self.avatar.storage, self.avatar.path
+            storage.delete(path)
+
+        super().delete(*args, **kwargs)

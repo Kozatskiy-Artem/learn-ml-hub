@@ -98,3 +98,18 @@ def update_profile(request):
     )
 
     return render(request, "auth/update_profile.html", {"form": form, "user_dto": user_dto})
+
+
+@login_required
+def delete_profile(request):
+    user_service = ServiceContainer.user_service()
+
+    if request.method == "POST":
+        try:
+            user_service.delete_profile(request.user.id)
+        except InstanceNotExistError:
+            return render(request, "not_found.html", {"message": "Профіль користувача не знайдено!"})
+
+        return redirect("/users/registration")
+
+    return render(request, "auth/delete_profile.html")

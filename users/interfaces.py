@@ -20,3 +20,7 @@ class UserRepositoryInterface(metaclass=ABCMeta):
     @abstractmethod
     def update_profile(self, update_user_dto):
         pass
+
+    @abstractmethod
+    def delete_profile(self, user_id):
+        pass

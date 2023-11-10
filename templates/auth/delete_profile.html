@@ -1,0 +1,18 @@
+{% extends '_base.html' %}
+
+{% block title %}Видалення профілю{% endblock %}
+
+{% block content %}
+<div class="col-lg-6 offset-lg-3 content-block">
+  <div class="block block-margin row">
+    <h2 style="text-align: center;">Видалення профілю</h2>
+    <hr>
+    <p style="text-align: center;">Ви впевнені, що хочете видали профіль? Всі ваші дані будуть втрачені.</p>
+    <form method="post" style="text-align: center;">
+      {% csrf_token %}
+      <input class="btn btn-danger" type="submit" value="Видалити профіль">
+      <a style="height: 38px;" class="btn btn-info bi bi-arrow-return-left profile-buttons" href="{{ '/users/profile' }}"></a>
+    </form>
+  </div>
+</div>
+{% endblock %}

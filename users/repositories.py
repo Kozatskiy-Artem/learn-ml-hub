@@ -59,6 +59,11 @@ class UserRepository(UserRepositoryInterface):
 
         return self._user_to_dto(user)
 
+    def delete_profile(self, user_id: int) -> None:
+        user = self._get_user_by_id(user_id=user_id)
+
+        user.delete()
+
     @staticmethod
     def _get_user_by_id(user_id: int) -> UserModel:
         """

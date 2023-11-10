@@ -1,13 +1,14 @@
 {% extends '_base.html' %}
 
-{% block title %}My profile{% endblock %}
+{% block title %}Оновлення профілю{% endblock %}
 
 {% block content %}
   <div class="col-lg-8 offset-lg-2 content-block">
     <form method="post" enctype="multipart/form-data" style="text-align: center;">
       {% csrf_token %}
       <div class="block block-margin row">
-        <h2>Редагування профілю</h2>
+        <h2 class="col-11">Редагування профілю</h2>
+        <a class="btn btn-info bi bi-arrow-return-left profile-buttons" href="{{ '/users/profile' }}"></a>
         <hr>
           <div class="col-lg-4">
             <img width="200px" height="200px" src="{{ user_dto.avatar }}" alt="User avatar">

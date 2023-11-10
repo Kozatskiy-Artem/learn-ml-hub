@@ -47,6 +47,9 @@ class UserService:
 
         return self.user_repository.update_profile(update_user_dto)
 
+    def delete_profile(self, user_id: int) -> None:
+        return self.user_repository.delete_profile(user_id=user_id)
+
     @staticmethod
     def _resize_avatar(avatar):
         """
