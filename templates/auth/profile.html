@@ -1,4 +1,5 @@
 {% extends '_base.html' %}
+{% load static %}
 
 {% block title %}Мій профіль{% endblock %}
 
@@ -10,16 +11,18 @@
       <a class="btn btn-danger bi bi-trash3 profile-buttons" href="{{ '/users/profile/delete' }}"></a>
       <hr>
       <div class="col-lg-4">
-          <img width="200px" height="200px" src="{{ user_dto.avatar }}" alt="User avatar">
+          <img
+                  width="200px"
+                  height="200px"
+                  src="{% if user_dto.avatar %}{{ user_dto.avatar }}{% else %}{% static 'img/default_avatar.png' %}{% endif %}"
+                  alt="User avatar"
+          >
       </div>
       <div class="col-lg-6">
         <p>Ім'я: {{ user_dto.first_name }} </p>
         <p>Прізвище: {{ user_dto.last_name }}</p>
         <p>Електронна адреса: {{ user_dto.email }}</p>
         <p>Дата реєстрації: {{ user_dto.date_joined }}</p>
-      </div>
-      <div class="col-lg-2">
-
       </div>
     </div>
   </div>
