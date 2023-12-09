@@ -2,6 +2,7 @@ import keras
 import numpy as np
 from PIL import Image
 
+from .dto import CreateImageDTO, ImageDTO
 from .interfaces import ImageRepositoryInterface
 
 
@@ -23,35 +24,30 @@ class ClassificationService:
     def __init__(self, image_repository: ImageRepositoryInterface):
         self.image_repository = image_repository
 
-    def get_prediction(self, user, title: str, image):
+    def get_prediction(self, image_dto: CreateImageDTO, model_name: str):
         """
         Get a prediction for the provided image.
 
         Args:
-           user: The user model object who uploaded the image.
-           title (str): The title of the image.
-           image: The image file.
+           image_dto: The user model object who uploaded the image.
 
         Returns:
            (image_instance, result) - A tuple containing the saved image instance and the classification result.
         """
 
-        img = self._resize_image(image)
+        resized_image = self._resize_image(image_dto.image)
+        created_image_dto = self._save_image(image_dto, image=resized_image)
+        image_array = self._normalize_image(resized_image)
 
-        image_instance = self._save_image(user=user, title=title, image=img, image_name=image.name)
-
-        img_array = self._normalize_image(img)
-
-        model = self.get_model()
-
-        prediction = model.predict(img_array)
+        classification_model = self.get_model(model_name)
+        prediction = classification_model.predict(image_array)
 
         if prediction[0] > 0.5:
             result = "Зображення містить собаку."
         else:
-            result = "Зображення містить кішку."
+            result = "Зображення містить кота."
 
-        return image_instance, result
+        return created_image_dto, result
 
     @staticmethod
     def _resize_image(image):
@@ -70,25 +66,23 @@ class ClassificationService:
 
         return resized_image
 
-    def _save_image(self, user, title, image, image_name):
+    def _save_image(self, image_dto: CreateImageDTO, image: Image) -> ImageDTO:
         """
         Save the image and its information.
 
         Args:
-            user: The user model object who uploaded the image.
-            title (str): The title of the image.
+            image_dto: The user model object who uploaded the image.
             image: The image file.
-            image_name (str): The name of the image file.
 
         Returns:
-            ImageModel: The saved image instance.
+            ImageDTO: The saved image instance.
 
         """
 
-        image_path = "images/" + image_name
-        image.save("media/" + image_path)
+        image_dto.image = "images/" + image_dto.image.name
+        image.save("media/" + image_dto.image)
 
-        image = self.image_repository.save_image(user=user, title=title, image_path=image_path)
+        image = self.image_repository.save_image(image_dto)
 
         return image
 
@@ -110,8 +104,14 @@ class ClassificationService:
 
         return image_array
 
+    def get_model(self, model_name: str):
+        if model_name == "cats_or_dogs_model":
+            return self._get_cats_or_dogs_model()
+        elif model_name == "cats_or_dogs_transfer_learned_model":
+            return self._get_cats_or_dogs_transfer_learned_model()
+
     @staticmethod
-    def get_model():
+    def _get_cats_or_dogs_model():
         """
         Get the pre-trained classification model.
 
@@ -142,5 +142,30 @@ class ClassificationService:
             metrics=["accuracy"],
         )
         model.load_weights("./classification/weights.h5")
+
+        return model
+
+    @staticmethod
+    def _get_cats_or_dogs_transfer_learned_model():
+        """
+        Get the pre-trained classification model.
+
+        Returns:
+            keras.Model - The pre-trained classification model.
+
+        """
+
+        model = keras.applications.InceptionV3(input_shape=(150, 150, 3), include_top=False, weights=None)
+        last_layer = model.get_layer("mixed7")
+        last_output = last_layer.output
+        x = keras.layers.Flatten()(last_output)
+        x = keras.layers.Dense(1024, activation="relu")(x)
+        x = keras.layers.Dense(512, activation="relu")(x)
+        x = keras.layers.Dropout(0.2)(x)
+        x = keras.layers.Dense(1, activation="sigmoid")(x)
+
+        model = keras.Model(model.input, x)
+
+        model.load_weights("./classification/transfer_learned_model_weights.h5")
 
         return model

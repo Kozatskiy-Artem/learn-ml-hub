@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+from .dto import CreateImageDTO
+
 
 class ImageRepositoryInterface(metaclass=ABCMeta):
     """
@@ -14,13 +16,11 @@ class ImageRepositoryInterface(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def save_image(self, user, title: str, image_path: str):
+    def save_image(self, image_dto: CreateImageDTO):
         """
         Abstract method to save image information to the repository.
 
         Args:
-            user: The user model object who uploaded the image.
-            title (str): The title of the image.
-            image_path (str): The file path of the image.
+            image_dto: The user model object who uploaded the image.
         """
         pass

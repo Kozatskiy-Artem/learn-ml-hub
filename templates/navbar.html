@@ -21,8 +21,14 @@
                     </ul>
                 </li>
                 {% if user.is_authenticated %}
-                    <li class="nav-item p-2">
-                        <a class="nav-link text-light" href="{{ '/classifications' }}">Класифікація</a>
+                    <li class="nav-item dropdown p-2">
+                        <a class="nav-link dropdown-toggle text-light" href="{{ '/classifications/cats_or_dogs' }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Класифікація
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ '/classifications/cats_or_dogs' }}">Кіт або собака</a></li>
+                            <li><a class="dropdown-item" href="{{ '/classifications/cats_or_dogs_pre_trained' }}">Кіт або собака, точніша модель</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item p-2 offset-lg-8">
                         <a class="nav-link text-light" href="{{ '/users/profile' }}">

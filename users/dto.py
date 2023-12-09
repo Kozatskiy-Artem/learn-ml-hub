@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import UploadedFile
 from pydantic import BaseModel
 
 
@@ -18,7 +18,7 @@ class UpdateUserDTO(BaseModel):
     id: int
     first_name: str
     last_name: str
-    avatar: Optional[InMemoryUploadedFile | str] = None
+    avatar: Optional[UploadedFile | str] = None
 
     class Config:
         arbitrary_types_allowed = True

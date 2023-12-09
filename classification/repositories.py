@@ -1,3 +1,8 @@
+from annoying.functions import get_object_or_None
+
+from users.models import UserModel
+
+from .dto import CreateImageDTO, ImageDTO
 from .interfaces import ImageRepositoryInterface
 from .models import ImageModel
 
@@ -14,20 +19,34 @@ class ImageRepository(ImageRepositoryInterface):
     - save_image(user, title, image_path): Saves image information to the database.
     """
 
-    def save_image(self, user, title: str, image_path: str) -> ImageModel:
+    def save_image(self, image_dto: CreateImageDTO) -> ImageDTO:
         """
         Saves image information to the database.
 
         Args:
-            user: The user model object who uploaded the image.
-            title (str): The title of the image.
-            image_path (str): The file path of the image.
+            image_dto: The user model object who uploaded the image.
 
         Returns:
-            ImageModel - The created ImageModel object.
+            ImageDTO - The created ImageModel object.
 
         """
 
-        image = ImageModel.objects.create(user=user, title=title, image=image_path)
+        user = get_object_or_None(UserModel, id=image_dto.user_id)
 
-        return image
+        image = ImageModel.objects.create(user=user, title=image_dto.title, image=image_dto.image)
+
+        return self._user_to_dto(image)
+
+    @staticmethod
+    def _user_to_dto(image: ImageModel) -> ImageDTO:
+        """
+        Convert a ImageModel instance to a ImageDTO.
+
+        Args:
+            image (ImageModel): The image model instance.
+
+        Returns:
+            ImageDTO - Data Transfer Object representing image data.
+        """
+
+        return ImageDTO(id=image.pk, user_id=image.user.pk, title=image.title, image=image.image.url)

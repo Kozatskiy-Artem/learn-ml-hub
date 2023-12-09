@@ -5,5 +5,6 @@ from . import views
 app_name = "classification"
 
 urlpatterns = [
-    path("", views.cats_or_dogs, name="cats_or_dogs"),
+    path("cats_or_dogs", views.cats_or_dogs, name="cats_or_dogs"),
+    path("cats_or_dogs_pre_trained", views.cats_or_dogs_pre_trained_model, name="cats_or_dogs_pre_trained_model"),
 ]

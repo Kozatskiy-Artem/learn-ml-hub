@@ -1,14 +1,14 @@
 {% extends '_base.html' %}
 
-{% block title %}Класифікація кішок та собак{% endblock %}
+{% block title %}Класифікація зображень котів та собак{% endblock %}
 
 {% block content %}
   <div class="col-lg-6 offset-lg-3">
     <div class="block block-margin">
-      <h1> Тут ми будемо класифікувати кішок та собак! </h1>
+      <h1> Кіт або собака? </h1>
     </div>
     <div class="block block-margin">
-      <h4> Завантажте фото, що містить кішку або собаку </h4>
+      <h4> Завантажте фото, що містить кота або собаку </h4>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
@@ -19,7 +19,7 @@
       <div class="block block-margin" style="text-align: center;">
         <h2> Результат класифікації </h2>
         <p>Ваше зображення:</p>
-        <img src="{{ image.image.url }}"  alt="Uploaded Image" style="display: block; margin: 0 auto;">
+        <img src="{{ image.image }}"  alt="Uploaded Image" style="display: block; margin: 0 auto;">
         <p>Результат ШІ: {{ prediction }}</p>
       </div>
     {% endif %}
