@@ -14,6 +14,22 @@
       <p>Кількість епох навчання: {{ model_dto.epochs }}</p>
     </div>
     <div class="block block-margin">
+      <h4> Протестуйте власну модель, завантажте фото, що містить кота або собаку </h4>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary col-12" type="submit">Класифікувати</button>
+      </form>
+    </div>
+    {% if image %}
+      <div class="block block-margin" style="text-align: center;">
+        <h2> Результат класифікації вашої моделі </h2>
+        <p>Ваше зображення:</p>
+        <img src="{{ image.image }}"  alt="Uploaded Image" style="display: block; margin: 0 auto;">
+        <p>Результат ШІ: {{ prediction }}</p>
+      </div>
+    {% endif %}
+    <div class="block block-margin">
       <h3>Результати навчанння моделі (точність):</h3>
       <canvas
               id="accuracy"

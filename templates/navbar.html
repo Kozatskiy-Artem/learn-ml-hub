@@ -30,8 +30,8 @@
                             <li><a class="dropdown-item" href="{{ '/classifications/cats_or_dogs_pre_trained' }}">Кіт або собака, точніша модель</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item p-2 offset-lg-8">
-                        <a class="nav-link text-light" href="{{ '/users/profile' }}">
+                    <li class="nav-item dropdown offset-lg-8">
+                        <a class="nav-link dropdown-toggle text-light" href="{{ '/users/profile' }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img
                                     width="30px"
                                     height="30px"
@@ -39,8 +39,12 @@
                                     src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/default_avatar.png' %}{% endif %}"
                                     alt="User avatar"
                             >
-
                         </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ '/users/profile' }}">Мій профіль</a></li>
+                            <li><a class="dropdown-item" href="{{ '/classifications/user_models' }}">Мої моделі</a></li>
+                            <li><a class="dropdown-item" href="{{ '/classifications/create_model' }}">Створити модель</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item p-2">
                         <a class="nav-link text-light" href="{{ '/users/logout/' }}">Logout</a>

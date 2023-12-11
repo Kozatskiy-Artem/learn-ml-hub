@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 from .dto import CreateImageDTO, HyperParamsDTO, ImageDTO
-from .interfaces import ImageRepositoryInterface
+from .interfaces import ClassificationModelRepositoryInterface, ImageRepositoryInterface
 
 
 class ClassificationService:
@@ -19,24 +19,35 @@ class ClassificationService:
 
     Attributes:
         image_repository (ImageRepositoryInterface): An instance of the image repository.
-        classification_model_repository: An instance of the classification model repository.
+        classification_model_repository (ClassificationModelRepositoryInterface):
+          An instance of the classification model repository.
 
     Methods:
 
     - get_prediction(image_dto, model_name): Get a prediction for the provided image.
+    - create_model(self, user, hyper_params_dto: HyperParamsDTO): Create a custom classification model based on
+      the provided hyperparameters, train the model, save its weights,
+      and store the model information in the repository.
+    - get_user_model(self, user, model_id): Retrieve details of a specific classification model owned by the user.
+    - get_user_models(self, user): Retrieve a list of classification models owned by the user.
     """
 
-    def __init__(self, image_repository: ImageRepositoryInterface, classification_model_repository):
+    def __init__(
+        self,
+        image_repository: ImageRepositoryInterface,
+        classification_model_repository: ClassificationModelRepositoryInterface,
+    ):
         self.image_repository = image_repository
         self.classification_model_repository = classification_model_repository
 
-    def get_prediction(self, image_dto: CreateImageDTO, model_name: str) -> tuple[ImageDTO, str]:
+    def get_prediction(self, image_dto: CreateImageDTO, model_name: str, model_dto=None) -> tuple[ImageDTO, str]:
         """
         Get a prediction for an image using a classification model.
 
         Args:
             image_dto (CreateImageDTO): Data transfer object containing image information.
             model_name (str): Name of classification model
+            model_dto: Data transfer object containing information about the requested model
 
         Returns:
             Tuple[ImageDTO, str] - A tuple containing the DTO of the saved image and the prediction result.
@@ -49,7 +60,7 @@ class ClassificationService:
         created_image_dto = self._save_image(image_dto, image=resized_image)
         image_array = self._normalize_image(resized_image)
 
-        classification_model = self.get_model(model_name)
+        classification_model = self._get_model(model_name, model_dto)
         prediction = classification_model.predict(image_array)
 
         if prediction[0] > 0.5:
@@ -114,7 +125,7 @@ class ClassificationService:
 
         return image_array
 
-    def get_model(self, model_name: str):
+    def _get_model(self, model_name: str, model_dto=None):
         """
         Retrieve a specific classification model based on the given model name.
 
@@ -122,6 +133,7 @@ class ClassificationService:
             model_name (str): The name of the model to retrieve. Valid options are:
                 - "cats_or_dogs_model": Retrieve a model for classifying cats or dogs.
                 - "cats_or_dogs_transfer_learned_model": Retrieve a transfer-learned model for classifying cats or dogs.
+            model_dto: Data transfer object containing information about the model
 
         Returns:
             Any: The requested classification model. The specific type of the model depends on the provided model_name.
@@ -131,6 +143,8 @@ class ClassificationService:
             return self._get_cats_or_dogs_model()
         elif model_name == "cats_or_dogs_transfer_learned_model":
             return self._get_cats_or_dogs_transfer_learned_model()
+        elif model_name == "user_model":
+            return self._get_custom_user_model(model_dto)
 
     @staticmethod
     def _get_cats_or_dogs_model():

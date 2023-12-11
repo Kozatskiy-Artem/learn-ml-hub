@@ -95,21 +95,8 @@ def create_model(request):
             classification_service = ServiceContainer.classification_service()
             model_dto = classification_service.create_model(request.user, hyper_params_dto)
 
-            epochs, accuracy, val_accuracy, loss, val_loss = zip(
-                *[
-                    (epoch.epoch_number, epoch.accuracy, epoch.val_accuracy, epoch.loss, epoch.val_loss)
-                    for epoch in model_dto.history
-                ]
-            )
+            context = get_model_context(model_dto)
 
-            context = {
-                "accuracy": list(accuracy),
-                "val_accuracy": list(val_accuracy),
-                "epochs": list(epochs),
-                "loss": list(loss),
-                "val_loss": list(val_loss),
-                "model_dto": model_dto,
-            }
             return render(request, "classification/user_model.html", context)
 
     form = HyperParamsForm()
@@ -120,15 +107,42 @@ def create_model(request):
 def get_user_model(request, model_id):
     """
     View for displaying details of a specific classification model owned by the logged-in user.
-    Retrieves the model information from the Classification Service and renders a page displaying the training history.
+    Retrieves the model information from the Classification Service and handles image uploads for classification.
+    If the request method is POST, process the uploaded image using the classification service.
+    Display the uploaded image and the classification result.
     """
 
     classification_service = ServiceContainer.classification_service()
+
+    if request.method == "POST":
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            image_dto = CreateImageDTO(user_id=request.user.id, **form.cleaned_data)
+
+            model_dto = classification_service.get_user_model(request.user, model_id)
+            image, prediction = classification_service.get_prediction(image_dto, "user_model", model_dto=model_dto)
+
+            form = ImageUploadForm()
+
+            context = get_model_context(model_dto)
+            context.update({"form": form, "image": image, "prediction": prediction})
+
+            return render(request, "classification/user_model.html", context)
+
+    form = ImageUploadForm()
+
     try:
         model_dto = classification_service.get_user_model(request.user, model_id)
     except InstanceNotExistError:
         return render(request, "not_found.html", {"message": "Дану модель не знайдено!"})
 
+    context = get_model_context(model_dto)
+    context["form"] = form
+
+    return render(request, "classification/user_model.html", context)
+
+
+def get_model_context(model_dto):
     epochs, accuracy, val_accuracy, loss, val_loss = zip(
         *[
             (epoch.epoch_number, epoch.accuracy, epoch.val_accuracy, epoch.loss, epoch.val_loss)
@@ -143,7 +157,7 @@ def get_user_model(request, model_id):
         "val_loss": list(val_loss),
         "model_dto": model_dto,
     }
-    return render(request, "classification/user_model.html", context)
+    return context
 
 
 @login_required

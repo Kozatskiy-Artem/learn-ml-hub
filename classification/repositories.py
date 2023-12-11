@@ -37,10 +37,10 @@ class ImageRepository(ImageRepositoryInterface):
 
         image = ImageModel.objects.create(user=user, title=image_dto.title, image=image_dto.image)
 
-        return self._user_to_dto(image)
+        return self._image_to_dto(image)
 
     @staticmethod
-    def _user_to_dto(image: ImageModel) -> ImageDTO:
+    def _image_to_dto(image: ImageModel) -> ImageDTO:
         """
         Convert a ImageModel instance to a ImageDTO.
 
