@@ -1,8 +1,10 @@
 from annoying.functions import get_object_or_None
+from django.db.models import QuerySet
 
+from core.exceptions import InstanceNotExistError
 from users.models import UserModel
 
-from .dto import CreateImageDTO, HistoryDTO, ImageDTO, ModelDTO
+from .dto import CreateImageDTO, HistoryDTO, ImageDTO, ModelDTO, ModelListDTO
 from .interfaces import ImageRepositoryInterface
 from .models import ClassificationModel, HistoryModel, ImageModel
 
@@ -115,6 +117,7 @@ class ClassificationModelRepository:
 
         Args:
             model (ClassificationModel): The model instance.
+            history_list_dto: A list of HistoryDTO objects representing history data.
 
         Returns:
             ModelDTO - Data Transfer Object representing model data.
@@ -166,3 +169,78 @@ class ClassificationModelRepository:
         history_list_dto = [self._history_to_dto(epoch) for epoch in history]
 
         return history_list_dto
+
+    def get_user_model(self, user, model_id: int) -> ModelDTO:
+        """
+        Retrieve details of a specific classification model owned by the user.
+
+        Args:
+            user: The user associated with the model.
+            model_id (int): The unique identifier of the model to retrieve.
+
+        Returns:
+            ModelDTO: Data transfer object containing information about the requested model.
+
+        Raises:
+            InstanceNotExistError: If the specified model does not exist.
+        """
+
+        model = get_object_or_None(ClassificationModel, pk=model_id, user=user)
+        if not model:
+            raise InstanceNotExistError(message=f"Model with id {model_id} does not exist")
+
+        history = HistoryModel.objects.filter(model=model)
+        history_list_dto = self._history_to_list_dto(history)
+
+        return self._model_to_dto(model, history_list_dto)
+
+    def get_user_models(self, user) -> list[ModelListDTO]:
+        """
+        Retrieve a list of classification models owned by the user.
+
+        Args:
+            user: The user associated with the models.
+
+        Returns:
+            list[ModelListDTO]: List of data transfer objects containing information about the user's models.
+        """
+
+        models = ClassificationModel.objects.filter(user=user)
+
+        return self._models_to_list_dto(models)
+
+    @staticmethod
+    def _model_list_to_dto(model: ClassificationModel) -> ModelListDTO:
+        """
+        Convert a ClassificationModel instance to a ModelListDTO.
+
+        Args:
+            model (ClassificationModel): The model instance.
+
+        Returns:
+            ModelListDTO - Data Transfer Object representing model data without history.
+        """
+
+        return ModelListDTO(
+            id=model.pk,
+            user_id=model.user.pk,
+            filters_1_layer=model.filters_1_layer,
+            filters_2_layer=model.filters_2_layer,
+            filters_3_layer=model.filters_3_layer,
+            dense_neurons=model.dense_neurons,
+            epochs=model.epochs,
+        )
+
+    def _models_to_list_dto(self, models: QuerySet[ClassificationModel]) -> list[ModelListDTO]:
+        """
+        Converts a list of ClassificationModel objects to a list of ModelListDTO objects.
+
+        Args:
+            models (QuerySet[ClassificationModel]): A list of ClassificationModel objects to be converted.
+
+        Returns:
+            list[ModelListDTO] - A list of ModelListDTO objects containing the converted data.
+        """
+        model_list_dto = [self._model_list_to_dto(model) for model in models]
+
+        return model_list_dto

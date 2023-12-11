@@ -309,3 +309,32 @@ class ClassificationService:
 
         random_chars = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
         return random_chars
+
+    def get_user_model(self, user, model_id):
+        """
+        Retrieve details of a specific classification model owned by the user.
+
+        This method delegates the call to the associated classification model repository.
+
+        Args:
+            user: The user associated with the model.
+            model_id: The unique identifier of the model to retrieve.
+
+        Returns:
+            ModelDTO: Data transfer object containing information about the requested model.
+        """
+        return self.classification_model_repository.get_user_model(user, model_id)
+
+    def get_user_models(self, user):
+        """
+        Retrieve a list of classification models owned by the user.
+
+        This method delegates the call to the associated classification model repository.
+
+        Args:
+            user: The user associated with the models.
+
+        Returns:
+            list[ModelListDTO]: List of data transfer objects containing information about the user's models.
+        """
+        return self.classification_model_repository.get_user_models(user)

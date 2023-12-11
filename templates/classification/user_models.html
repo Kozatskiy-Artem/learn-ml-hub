@@ -1,0 +1,21 @@
+{% extends '_base.html' %}
+
+{% block title %}Моделі користувача{% endblock %}
+
+{% block content %}
+  <div class="col-lg-6 offset-lg-3">
+    {% for model_dto in models_dto %}
+      <div class="block block-margin" style="text-align: center;">
+        <h4>Гіперпараметри моделі</h4>
+        <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_1_layer }}</p>
+        <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_2_layer }}</p>
+        <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_3_layer }}</p>
+        <p>Кількість нейронів на повнозв'язаному шарі:{{ model_dto.dense_neurons }}</p>
+        <p>Кількість епох навчання: {{ model_dto.epochs }}</p>
+        <a href="{% url 'classification:user_model' model_dto.id %}">
+          <button type="button" class="btn btn-info">Переглянути результати навчання</button>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

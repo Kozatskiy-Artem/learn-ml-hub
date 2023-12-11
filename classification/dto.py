@@ -48,3 +48,13 @@ class HistoryDTO(BaseModel):
     val_accuracy: float
     loss: float
     val_loss: float
+
+
+class ModelListDTO(BaseModel):
+    id: int
+    user_id: int
+    filters_1_layer: int
+    filters_2_layer: int
+    filters_3_layer: int
+    dense_neurons: int
+    epochs: int
