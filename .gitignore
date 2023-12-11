@@ -135,3 +135,6 @@ dmypy.json
 
 media/
 *.h5
+tmp/
+weights/
+cats_and_dogs_filtered.zip

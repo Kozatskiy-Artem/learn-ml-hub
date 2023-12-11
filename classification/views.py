@@ -3,8 +3,8 @@ from django.shortcuts import render
 
 from core.containers import ServiceContainer
 
-from .dto import CreateImageDTO
-from .forms import ImageUploadForm
+from .dto import CreateImageDTO, HyperParamsDTO
+from .forms import HyperParamsForm, ImageUploadForm
 
 
 @login_required()
@@ -75,3 +75,41 @@ def cats_or_dogs_pre_trained_model(request):
 
     form = ImageUploadForm()
     return render(request, "classification/cats_or_dogs_transfer_learned_model.html", {"form": form})
+
+
+@login_required
+def create_model(request):
+    """
+        View for handling the creation of a classification model based on user-provided hyperparameters.
+
+        This view expects a POST request with form data containing hyperparameters. Upon successful form validation,
+        it uses the Classification Service to create a model, retrieves the training history, and renders a page
+        displaying model metrics over epochs.
+    """
+
+    if request.method == "POST":
+        form = HyperParamsForm(request.POST)
+        if form.is_valid():
+            hyper_params_dto = HyperParamsDTO(**form.cleaned_data)
+            classification_service = ServiceContainer.classification_service()
+            model_dto = classification_service.create_model(request.user, hyper_params_dto)
+
+            epochs, accuracy, val_accuracy, loss, val_loss = zip(
+                *[
+                    (epoch.epoch_number, epoch.accuracy, epoch.val_accuracy, epoch.loss, epoch.val_loss)
+                    for epoch in model_dto.history
+                ]
+            )
+
+            context = {
+                "accuracy": accuracy,
+                "val_accuracy": val_accuracy,
+                "epochs": epochs,
+                "loss": loss,
+                "val_loss": val_loss,
+                "model_dto": model_dto,
+            }
+            return render(request, "classification/user_model.html", context)
+
+    form = HyperParamsForm()
+    return render(request, "classification/create_model.html", {"form": form})

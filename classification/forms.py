@@ -17,3 +17,36 @@ class ImageUploadForm(forms.Form):
             }
         ),
     )
+
+
+class HyperParamsForm(forms.Form):
+    filters_1_layer = forms.IntegerField(
+        min_value=1,
+        max_value=128,
+        label="Кількість фільтрів на першому згорткову шарі:",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    filters_2_layer = forms.IntegerField(
+        min_value=1,
+        max_value=128,
+        label="Кількість фільтрів на другому згорткову шарі:",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    filters_3_layer = forms.IntegerField(
+        min_value=1,
+        max_value=128,
+        label="Кількість фільтрів на третьому згорткову шарі:",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    dense_neurons = forms.IntegerField(
+        min_value=1,
+        max_value=1024,
+        label="Кількість нейронів на повнозв'язаному шарі:",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    epochs = forms.IntegerField(
+        min_value=1,
+        max_value=20,
+        label="Кількість епох навчання:",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )

@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Класифікація зображень котів та собак{% endblock %}
+
+{% block content %}
+  <div class="col-lg-6 offset-lg-3">
+    <div class="block block-margin">
+      <h2>Задані гіперпараметри моделі</h2>
+      <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_1_layer }}</p>
+      <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_2_layer }}</p>
+      <p>Кількість фільтрів на першому згорковому шарі: {{ model_dto.filters_3_layer }}</p>
+      <p>Кількість нейронів на повнозв'язаному шарі:{{ model_dto.dense_neurons }}</p>
+      <p>Кількість епох навчання: {{ model_dto.epochs }}</p>
+    </div>
+    <div class="block block-margin">
+      <h3>Результати навчанння моделі (точність):</h3>
+      <canvas
+              id="accuracy"
+              width="400"
+              height="300"
+              data-data1="{{ accuracy }}"
+              data-data2="{{ val_accuracy }}"
+              data-data3="{{ epochs }}"
+      >
+      </canvas>
+    </div>
+    <div class="block block-margin">
+      <h3>Результати навчанння моделі (похибка):</h3>
+      <canvas
+              id="loss"
+              width="400"
+              height="300"
+              data-data1="{{ loss }}"
+              data-data2="{{ val_loss }}"
+              data-data3="{{ epochs }}"
+      >
+      </canvas>
+    </div>
+  </div>
+  <script src="{% static 'js/accuracy_chart.js' %}"></script>
+  <script src="{% static 'js/loss_chart.js' %}"></script>
+{% endblock %}

@@ -1,8 +1,13 @@
+import os
+import random
+import string
+import zipfile
+
 import keras
 import numpy as np
 from PIL import Image
 
-from .dto import CreateImageDTO, ImageDTO
+from .dto import CreateImageDTO, HyperParamsDTO, ImageDTO
 from .interfaces import ImageRepositoryInterface
 
 
@@ -10,29 +15,34 @@ class ClassificationService:
     """
     A service class for image classification.
 
-    This class provides methods for resizing, normalizing, saving and classifying images.
+    This class provides methods for classifying images and building new artificial neural network models.
 
     Attributes:
         image_repository (ImageRepositoryInterface): An instance of the image repository.
+        classification_model_repository: An instance of the classification model repository.
 
     Methods:
 
-    - get_prediction(user, title, image): Get a prediction for the provided image.
-
+    - get_prediction(image_dto, model_name): Get a prediction for the provided image.
     """
 
-    def __init__(self, image_repository: ImageRepositoryInterface):
+    def __init__(self, image_repository: ImageRepositoryInterface, classification_model_repository):
         self.image_repository = image_repository
+        self.classification_model_repository = classification_model_repository
 
-    def get_prediction(self, image_dto: CreateImageDTO, model_name: str):
+    def get_prediction(self, image_dto: CreateImageDTO, model_name: str) -> tuple[ImageDTO, str]:
         """
-        Get a prediction for the provided image.
+        Get a prediction for an image using a classification model.
 
         Args:
-           image_dto: The user model object who uploaded the image.
+            image_dto (CreateImageDTO): Data transfer object containing image information.
+            model_name (str): Name of classification model
 
         Returns:
-           (image_instance, result) - A tuple containing the saved image instance and the classification result.
+            Tuple[ImageDTO, str] - A tuple containing the DTO of the saved image and the prediction result.
+                - The first element is a CreateImageDTO object with information about the saved image.
+                - The second element is a string indicating the prediction result,
+                either "Image contains a dog." or "Image contains a cat."
         """
 
         resized_image = self._resize_image(image_dto.image)
@@ -105,6 +115,18 @@ class ClassificationService:
         return image_array
 
     def get_model(self, model_name: str):
+        """
+        Retrieve a specific classification model based on the given model name.
+
+        Args:
+            model_name (str): The name of the model to retrieve. Valid options are:
+                - "cats_or_dogs_model": Retrieve a model for classifying cats or dogs.
+                - "cats_or_dogs_transfer_learned_model": Retrieve a transfer-learned model for classifying cats or dogs.
+
+        Returns:
+            Any: The requested classification model. The specific type of the model depends on the provided model_name.
+        """
+
         if model_name == "cats_or_dogs_model":
             return self._get_cats_or_dogs_model()
         elif model_name == "cats_or_dogs_transfer_learned_model":
@@ -113,11 +135,12 @@ class ClassificationService:
     @staticmethod
     def _get_cats_or_dogs_model():
         """
-        Get the pre-trained classification model.
+        Create and return a Sequential model for classifying cats or dogs.
+
+        The model architecture consists of convolutional layers with max-pooling followed by fully connected layers.
 
         Returns:
-            keras.Model - The pre-trained classification model.
-
+            keras.models.Sequential: The created cats or dogs classification model.
         """
 
         model = keras.models.Sequential(
@@ -136,11 +159,6 @@ class ClassificationService:
             ]
         )
 
-        model.compile(
-            loss="binary_crossentropy",
-            optimizer=keras.optimizers.RMSprop(learning_rate=1e-4),
-            metrics=["accuracy"],
-        )
         model.load_weights("./classification/weights.h5")
 
         return model
@@ -148,13 +166,13 @@ class ClassificationService:
     @staticmethod
     def _get_cats_or_dogs_transfer_learned_model():
         """
-        Get the pre-trained classification model.
+        Create and return a transfer-learned InceptionV3-based model for classifying cats or dogs.
+
+        The model uses the InceptionV3 architecture with additional dense layers for classification.
 
         Returns:
-            keras.Model - The pre-trained classification model.
-
+            keras.models.Model: The created transfer-learned cats or dogs classification model.
         """
-
         model = keras.applications.InceptionV3(input_shape=(150, 150, 3), include_top=False, weights=None)
         last_layer = model.get_layer("mixed7")
         last_output = last_layer.output
@@ -169,3 +187,125 @@ class ClassificationService:
         model.load_weights("./classification/transfer_learned_model_weights.h5")
 
         return model
+
+    def create_model(self, user, hyper_params_dto: HyperParamsDTO):
+        """
+        Create a custom classification model based on the provided hyperparameters, train the model,
+        save its weights, and store the model information in the repository.
+
+        Args:
+            user: The user associated with the model.
+            hyper_params_dto (HyperParamsDTO): Data transfer object containing hyperparameters for model creation.
+
+        Returns:
+            ModelDTO: Data transfer object containing information about the created model.
+        """
+
+        model = self._get_custom_user_model(hyper_params_dto)
+
+        model.compile(
+            loss="binary_crossentropy",
+            optimizer=keras.optimizers.RMSprop(learning_rate=1e-4),
+            metrics=["accuracy"],
+        )
+
+        train_generator, validation_generator = self._get_data()
+
+        history = model.fit(
+            train_generator,
+            validation_data=validation_generator,
+            steps_per_epoch=100,
+            epochs=hyper_params_dto.epochs,
+            validation_steps=50,
+            verbose=2,
+        )
+
+        weights_path = "weights/custom_model_weights" + self._generate_random_string() + ".h5"
+        model.save_weights(weights_path)
+
+        return self.classification_model_repository.create_model(user, hyper_params_dto, weights_path, history)
+
+    @staticmethod
+    def _get_custom_user_model(hyper_params_dto: HyperParamsDTO):
+        """
+        Create and return a custom user-defined Sequential model based on the provided hyperparameters.
+
+        Args:
+            hyper_params_dto (HyperParamsDTO): Data transfer object containing hyperparameters for model creation.
+
+        Returns:
+            keras.models.Sequential: The created custom user-defined classification model.
+        """
+
+        model = keras.models.Sequential(
+            [
+                keras.layers.Conv2D(
+                    hyper_params_dto.filters_1_layer, (3, 3), activation="relu", input_shape=(150, 150, 3)
+                ),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Conv2D(
+                    hyper_params_dto.filters_2_layer, (3, 3), activation="relu", input_shape=(150, 150, 3)
+                ),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Conv2D(
+                    hyper_params_dto.filters_3_layer, (3, 3), activation="relu", input_shape=(150, 150, 3)
+                ),
+                keras.layers.MaxPooling2D(2, 2),
+                keras.layers.Flatten(),
+                keras.layers.Dense(hyper_params_dto.dense_neurons, activation="relu"),
+                keras.layers.Dense(1, activation="sigmoid"),
+            ]
+        )
+        return model
+
+    @staticmethod
+    def _get_data():
+        """
+        Load and preprocess the training and validation data for model training.
+
+        Returns:
+            Tuple[keras.preprocessing.image.DirectoryIterator, keras.preprocessing.image.DirectoryIterator]:
+                A tuple containing the training and validation data generators.
+        """
+        zip_ref = zipfile.ZipFile("cats_and_dogs_filtered.zip", "r")
+        zip_ref.extractall("tmp/")
+        zip_ref.close()
+
+        base_dir = "tmp/cats_and_dogs_filtered"
+
+        train_dir = os.path.join(base_dir, "train")
+        validation_dir = os.path.join(base_dir, "validation")
+
+        train_datagen = keras.preprocessing.image.ImageDataGenerator(
+            rescale=1.0 / 255.0,
+            rotation_range=40,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True,
+        )
+
+        test_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1.0 / 255.0)
+
+        train_generator = train_datagen.flow_from_directory(
+            train_dir, batch_size=20, class_mode="binary", target_size=(150, 150)
+        )
+
+        validation_generator = test_datagen.flow_from_directory(
+            validation_dir, batch_size=20, class_mode="binary", target_size=(150, 150)
+        )
+
+        return train_generator, validation_generator
+
+    @staticmethod
+    def _generate_random_string():
+        """
+        Generate a random string with a sequence of 10 characters.
+
+        Returns:
+            str: A string containing a random sequence of 10 characters.
+        """
+
+        random_chars = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+        return random_chars

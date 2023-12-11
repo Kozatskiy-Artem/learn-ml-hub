@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="col-lg-4 offset-lg-4 content-block">
+  <div class="block block-margin">
+    <h2 class="title" style="text-align: center;">Створіть власну модель штучної нейронної мережі</h2>
+    <p style="text-align: center;">Введіть гіперпараметри</p>
+    <form method="POST" style="text-align: center;">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input class="button btn btn-primary" type="submit" value="Створити">
+    </form>
+  </div>
+</div>
+{% endblock %}
